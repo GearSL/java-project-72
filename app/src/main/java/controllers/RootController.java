@@ -3,5 +3,5 @@ package controllers;
 import io.javalin.http.Handler;
 
 public class RootController {
-    public static Handler welcome = ctx -> ctx.result("Hello World");
+    public static Handler welcome = ctx -> ctx.render("index.html");
 }

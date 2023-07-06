@@ -2,6 +2,11 @@ package hexlet.code;
 
 import controllers.RootController;
 import io.javalin.Javalin;
+import io.javalin.rendering.template.JavalinThymeleaf;
+import nz.net.ultraq.thymeleaf.layoutdialect.LayoutDialect;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.extras.java8time.dialect.Java8TimeDialect;
+import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 
 public class App {
     private static int getPort() {
@@ -18,6 +23,20 @@ public class App {
         return getMode().equals("production");
     }
 
+    private static TemplateEngine getTemplateEngine() {
+        TemplateEngine templateEngine = new TemplateEngine();
+
+        ClassLoaderTemplateResolver templateResolver = new ClassLoaderTemplateResolver();
+        templateResolver.setPrefix("/templates/");
+        templateResolver.setCharacterEncoding("UTF-8");
+
+        templateEngine.addTemplateResolver(templateResolver);
+        templateEngine.addDialect(new LayoutDialect());
+        templateEngine.addDialect(new Java8TimeDialect());
+
+        return templateEngine;
+    }
+
     private static void addRoutes(Javalin app) {
         app.get("/", RootController.welcome);
     }
@@ -27,6 +46,7 @@ public class App {
             if (!isProduction()) {
                 config.plugins.enableDevLogging();
             }
+            JavalinThymeleaf.init(getTemplateEngine());
         });
 
         addRoutes(app);
