@@ -10,6 +10,7 @@ public class App {
     }
 
     private static String getMode() {
+        System.out.println("!!!ENVIRONMENT: " + System.getenv());
         return System.getenv().getOrDefault("APP_ENV", "development");
     }
 
