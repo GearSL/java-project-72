@@ -44,12 +44,12 @@ public class App {
     private static void addRoutes(Javalin app) {
         app.get("/", RootController.welcome);
 
-        app.routes(() ->
-                path("urls", () -> {
+        app.routes(() -> path("urls", () -> {
                     get(SiteController.showSitesList);
                     post(SiteController.addSite);
                     get("{id}", SiteController.showUrl);
-                }));
+                })
+        );
     }
 
     public static Javalin getApp() {
