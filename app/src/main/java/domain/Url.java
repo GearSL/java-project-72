@@ -17,4 +17,8 @@ public class Url extends Model {
     String name;
     @WhenCreated
     private Instant createdAt;
+
+    public Url(String siteName) {
+        name = siteName;
+    }
 }

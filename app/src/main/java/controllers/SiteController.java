@@ -8,20 +8,24 @@ import java.util.List;
 
 public final class SiteController {
     public static Handler addSite = ctx -> {
-        Url url = new Url();
         String fullUrl = ctx.formParam("url");
-        String protocol = "";
-        String host = "";
-        int port = 0;
+        String protocol;
+        String host;
+        int port;
 
-        if (fullUrl != null) {
+        if (fullUrl != null && !fullUrl.isEmpty()) {
             URL urlParser = new URL(fullUrl);
             port = urlParser.getPort();
             host = urlParser.getHost();
             protocol = urlParser.getProtocol();
+        } else {
+            ctx.sessionAttribute("flash", "Укажите корректный URL");
+            ctx.sessionAttribute("flash-type", "danger");
+            ctx.redirect("/");
+            return;
         }
         String resultName = protocol + "://" + host + (port == -1 ? "" : ":" + port);
-        url.setName(resultName);
+        Url url = new Url(resultName);
         List<Url> similarUrls = new QUrl().where().name.contains(host).findList();
 
         if (similarUrls.size() > 1) {
@@ -38,7 +42,7 @@ public final class SiteController {
                 .findList();
 
         ctx.attribute("urls", urls);
-        ctx.render("sites/index.html");
+        ctx.redirect("/urls");
     };
 
     public static Handler showSitesList = ctx -> {
