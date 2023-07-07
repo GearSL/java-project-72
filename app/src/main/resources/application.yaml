@@ -7,8 +7,21 @@ datasource:
   production:
     username: ${JDBC_DATABASE_USERNAME}
     password: ${JDBC_DATABASE_PASSWORD}
-    url: ${JDBC_DATABASE_URL}
+    url: jdbc:postgresql://${DATABASE_HOST}:${DATABASE_PORT}/${DATABASE_NAME}
 
 ebean:
+  db:
+    ddl:
+      run: true
+      generate: true
+      seedSql: seed.sql
   migration:
     run: true
+
+  h2:
+    console:
+      enabled: true
+      # Указываем путь, по которому будет открываться консоль
+      path: /h2console/
+      settings:
+        web-allow-others: true

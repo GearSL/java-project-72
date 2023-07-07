@@ -1,12 +1,17 @@
 package hexlet.code;
 
 import controllers.RootController;
+import controllers.SiteController;
 import io.javalin.Javalin;
 import io.javalin.rendering.template.JavalinThymeleaf;
 import nz.net.ultraq.thymeleaf.layoutdialect.LayoutDialect;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.extras.java8time.dialect.Java8TimeDialect;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
+
+import static io.javalin.apibuilder.ApiBuilder.path;
+import static io.javalin.apibuilder.ApiBuilder.get;
+import static io.javalin.apibuilder.ApiBuilder.post;
 
 public class App {
     private static int getPort() {
@@ -15,7 +20,6 @@ public class App {
     }
 
     private static String getMode() {
-        System.out.println("!!!ENVIRONMENT: " + System.getenv());
         return System.getenv().getOrDefault("APP_ENV", "development");
     }
 
@@ -39,10 +43,18 @@ public class App {
 
     private static void addRoutes(Javalin app) {
         app.get("/", RootController.welcome);
+
+        app.routes(() ->
+                path("urls", () -> {
+                    get(SiteController.showSitesList);
+                    post(SiteController.addSite);
+                    get("{id}", SiteController.showUrl);
+                }));
     }
 
     public static Javalin getApp() {
         Javalin app = Javalin.create(config -> {
+            config.staticFiles.enableWebjars();
             if (!isProduction()) {
                 config.plugins.enableDevLogging();
             }
@@ -50,9 +62,7 @@ public class App {
         });
 
         addRoutes(app);
-
         app.before(ctx -> ctx.attribute("ctx", ctx));
-
         return app;
     }
 
