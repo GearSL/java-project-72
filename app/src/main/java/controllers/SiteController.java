@@ -46,9 +46,9 @@ public final class SiteController {
     };
 
     public static Handler showSitesList = ctx -> {
-      List<Url> urls = new QUrl().findList();
-      ctx.attribute("urls", urls);
-      ctx.render("sites/index.html");
+        List<Url> urls = new QUrl().findList();
+        ctx.attribute("urls", urls);
+        ctx.render("sites/index.html");
     };
 
     public static Handler showUrl = ctx -> {
