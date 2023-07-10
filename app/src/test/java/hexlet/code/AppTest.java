@@ -20,7 +20,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 
-public class AppTest {
+public final class AppTest {
     private static Javalin app;
     private static String baseUrl;
     private static Url existingUrl;
