@@ -1,5 +1,6 @@
 package hexlet.code;
 
+import controllers.CheckController;
 import controllers.RootController;
 import controllers.SiteController;
 import io.javalin.Javalin;
@@ -49,6 +50,7 @@ public class App {
                 get(SiteController.showSitesList);
                 post(SiteController.addSite);
                 get("{id}", SiteController.showUrl);
+                post("{id}/checks", CheckController.addCheck);
             });
         }
         );

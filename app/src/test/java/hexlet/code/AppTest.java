@@ -8,12 +8,17 @@ import io.javalin.Javalin;
 import static org.assertj.core.api.Assertions.assertThat;
 import kong.unirest.HttpResponse;
 import kong.unirest.Unirest;
+import okhttp3.HttpUrl;
+import okhttp3.mockwebserver.MockResponse;
+import okhttp3.mockwebserver.MockWebServer;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+
+import java.io.IOException;
 
 public class AppTest {
     private static Javalin app;
@@ -83,7 +88,7 @@ public class AppTest {
         void createSite() {
             String newSite = "https://sometestsite.com/somepage";
             String hostName = "https://sometestsite.com";
-            HttpResponse<String> responsePost = Unirest
+            HttpResponse responsePost = Unirest
                     .post(baseUrl + "/urls")
                     .field("url", newSite)
                     .asEmpty();
@@ -105,6 +110,34 @@ public class AppTest {
 
             assertThat(actualUrl).isNotNull();
             assertThat(actualUrl.getName()).isEqualTo(hostName);
+        }
+    }
+
+    @Nested
+    class CheckTest {
+        @Test
+        public void createSuccessfulRequest() {
+            MockWebServer server = new MockWebServer();
+            server.url(existingUrl.toString());
+            server.enqueue(new MockResponse().setBody("hello, world!"));
+
+            HttpUrl appendUrl = server.url("/urls/1/checks");
+            HttpResponse responsePost = Unirest
+                    .post(appendUrl.toString())
+                    .asString();
+            assertThat(responsePost.getBody()).isEqualTo("hello, world!");
+        }
+
+        @Test
+        public void createBadRequest() throws IOException {
+            MockWebServer server = new MockWebServer();
+            server.url(existingUrl.toString()).toString();
+            server.enqueue(new MockResponse().setBody("hello, world!"));
+
+            HttpResponse responsePost = Unirest
+                    .post(baseUrl + "/urls/2/checks")
+                    .asString();
+            assertThat(responsePost.getStatus()).isEqualTo(302);
         }
     }
 }

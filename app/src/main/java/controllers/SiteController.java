@@ -1,7 +1,9 @@
 package controllers;
 
 import domain.Url;
+import domain.UrlCheck;
 import domain.query.QUrl;
+import domain.query.QUrlCheck;
 import io.javalin.http.Handler;
 import java.net.URL;
 import java.util.List;
@@ -28,7 +30,7 @@ public final class SiteController {
         Url url = new Url(resultName);
         List<Url> similarUrls = new QUrl().where().name.contains(host).findList();
 
-        if (similarUrls.size() > 1) {
+        if (similarUrls.size() >= 1) {
             ctx.sessionAttribute("flash", "Страница уже существует");
             ctx.sessionAttribute("flash-type", "danger");
         } else {
@@ -46,7 +48,8 @@ public final class SiteController {
     };
 
     public static Handler showSitesList = ctx -> {
-        List<Url> urls = new QUrl().findList();
+        List<Url> urls = new QUrl()
+                .findList();
         ctx.attribute("urls", urls);
         ctx.render("sites/index.html");
     };
@@ -54,7 +57,10 @@ public final class SiteController {
     public static Handler showUrl = ctx -> {
         int id = ctx.pathParamAsClass("id", Integer.class).getOrDefault(null);
         Url url = new QUrl().id.equalTo(id).findOne();
+        List<UrlCheck> urlChecks = new QUrlCheck().url.equalTo(url).findList();
+
         ctx.attribute("url", url);
+        ctx.attribute("urlChecks", urlChecks);
         ctx.render("sites/show.html");
     };
 }
