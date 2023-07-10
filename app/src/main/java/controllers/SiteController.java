@@ -57,6 +57,13 @@ public final class SiteController {
     public static Handler showUrl = ctx -> {
         int id = ctx.pathParamAsClass("id", Integer.class).getOrDefault(null);
         Url url = new QUrl().id.equalTo(id).findOne();
+
+        if (url == null) {
+            ctx.status(404);
+            ctx.result("Resource not found =(");
+            return;
+        }
+
         List<UrlCheck> urlChecks = new QUrlCheck().url.equalTo(url).findList();
 
         ctx.attribute("url", url);

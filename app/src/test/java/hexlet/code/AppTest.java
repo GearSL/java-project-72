@@ -85,6 +85,17 @@ public class AppTest {
         }
 
         @Test
+        void testAttemptOpenNonExistentWebsite() {
+            HttpResponse<String> response = Unirest
+                    .get(baseUrl + "/urls/99")
+                    .asString();
+            String body = response.getBody();
+
+            assertThat(response.getStatus()).isEqualTo(404);
+            assertThat(body).contains("Resource not found");
+        }
+
+        @Test
         void createSite() {
             String newSite = "https://sometestsite.com/somepage";
             String hostName = "https://sometestsite.com";
