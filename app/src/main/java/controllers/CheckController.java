@@ -41,6 +41,9 @@ public class CheckController {
             urlCheck.setH1(firstH1Tag);
             urlCheck.setDescription(description);
             urlCheck.save();
+
+            ctx.sessionAttribute("flash", "Страница успешно проверена");
+            ctx.sessionAttribute("flash-type", "success");
         } else {
             ctx.sessionAttribute("flash", "Не найден URL для которого следует выполнить проверку");
         }
