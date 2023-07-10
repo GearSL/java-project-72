@@ -4,6 +4,7 @@ run-dist: build
 	./build/install/app/bin/app
 
 build: clear
+	./gradlew build
 	./gradlew installDist
 
 clear:

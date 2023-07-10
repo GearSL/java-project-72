@@ -1,8 +1,8 @@
 package hexlet.code;
 
-import controllers.CheckController;
-import controllers.RootController;
-import controllers.SiteController;
+import hexlet.code.controllers.CheckController;
+import hexlet.code.controllers.RootController;
+import hexlet.code.controllers.SiteController;
 import io.javalin.Javalin;
 import io.javalin.rendering.template.JavalinThymeleaf;
 import nz.net.ultraq.thymeleaf.layoutdialect.LayoutDialect;

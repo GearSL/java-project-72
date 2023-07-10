@@ -1,7 +1,7 @@
 package hexlet.code;
 
-import domain.Url;
-import domain.query.QUrl;
+import hexlet.code.domain.Url;
+import hexlet.code.domain.query.QUrl;
 import io.ebean.DB;
 import io.ebean.Transaction;
 import io.javalin.Javalin;
@@ -92,7 +92,7 @@ public final class AppTest {
             String body = response.getBody();
 
             assertThat(response.getStatus()).isEqualTo(404);
-            assertThat(body).contains("Resource not found");
+            assertThat(body).contains("Not Found");
         }
 
         @Test
@@ -132,7 +132,7 @@ public final class AppTest {
             server.url(existingUrl.toString());
             server.enqueue(new MockResponse().setBody("hello, world!"));
 
-            HttpUrl appendUrl = server.url("/urls/1/checks");
+            HttpUrl appendUrl = server.url("/urls/" + existingUrl.getId() + "/checks");
             HttpResponse responsePost = Unirest
                     .post(appendUrl.toString())
                     .asString();
@@ -146,7 +146,8 @@ public final class AppTest {
             server.enqueue(new MockResponse().setBody("hello, world!"));
 
             HttpResponse responsePost = Unirest
-                    .post(baseUrl + "/urls/2/checks")
+                    //999 - identifier which can't be in our DB
+                    .post(baseUrl + "/urls/999/checks")
                     .asString();
             assertThat(responsePost.getStatus()).isEqualTo(302);
         }

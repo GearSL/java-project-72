@@ -1,4 +1,4 @@
-package domain;
+package hexlet.code.domain;
 
 import io.ebean.Model;
 import io.ebean.annotation.WhenCreated;
