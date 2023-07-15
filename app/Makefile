@@ -18,3 +18,5 @@ check:
 
 tasks:
 	./gradlew tasks
+
+.PHONY: build

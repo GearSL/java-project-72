@@ -17,18 +17,19 @@ public final class SiteController {
         String host = "";
         int port = 0;
 
-        URL urlParser;
+        URL urlParser = null;
 
         try {
             urlParser = new URL(inputUrl);
-            port = urlParser.getPort();
-            host = urlParser.getHost();
-            protocol = urlParser.getProtocol();
         } catch (Exception e) {
             ctx.sessionAttribute("flash", "Укажите корректный URL");
             ctx.sessionAttribute("flash-type", "danger");
             ctx.redirect("/");
         }
+        port = urlParser.getPort();
+        host = urlParser.getHost();
+        protocol = urlParser.getProtocol();
+
         String resultName = protocol + "://" + host + (port == -1 ? "" : ":" + port);
         Url url = new Url(resultName);
         Url similarUrl = new QUrl()

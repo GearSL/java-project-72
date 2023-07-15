@@ -8,7 +8,6 @@ import kong.unirest.HttpResponse;
 import kong.unirest.Unirest;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import java.util.Objects;
 
 public class CheckController {
     public static Handler addCheck = ctx -> {
@@ -16,23 +15,28 @@ public class CheckController {
         String title = "";
         String description = "";
         int statusCode = 0;
+        HttpResponse<String> response = null;
 
         long urlId = Long.parseLong(ctx.pathParam("id"));
         Url url = new QUrl().id.equalTo(urlId).findOne();
 
         if (url != null) {
-            HttpResponse<String> response = Unirest.get(url.getName())
-                    .header("Content-Type", "application/json")
-                    .asString();
+            try {
+                response = Unirest.get(url.getName())
+                        .header("Content-Type", "application/json")
+                        .asString();
+            } catch (Exception e) {
+                ctx.sessionAttribute("flash", "Произошла ошибка при попытке запроса данных сайта");
+                ctx.sessionAttribute("flash-type", "danger");
+            }
+
             String htmlBody = response.getBody();
             Document document = Jsoup.parse(htmlBody);
 
             statusCode = response.getStatus();
-            firstH1Tag = Objects.requireNonNull(document.select("h1").first()).text();
-            title = Objects.requireNonNull(document.select("title").first()).text();
-            description = Objects.requireNonNull(document.select("meta[name=description]")
-                    .first()).attr("content");
-
+            firstH1Tag = document.select("h1").first().text();
+            title = document.select("title").first().text();
+            description = document.select("meta[name=description]").first().attr("content");
 
             UrlCheck urlCheck = new UrlCheck();
             urlCheck.setUrl(url);

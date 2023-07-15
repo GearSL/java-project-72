@@ -1,14 +1,15 @@
 package hexlet.code;
 
 import hexlet.code.domain.Url;
+import hexlet.code.domain.UrlCheck;
 import hexlet.code.domain.query.QUrl;
+import hexlet.code.domain.query.QUrlCheck;
 import io.ebean.DB;
 import io.ebean.Transaction;
 import io.javalin.Javalin;
 import static org.assertj.core.api.Assertions.assertThat;
 import kong.unirest.HttpResponse;
 import kong.unirest.Unirest;
-import okhttp3.HttpUrl;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.junit.jupiter.api.AfterAll;
@@ -23,18 +24,40 @@ import java.io.IOException;
 public final class AppTest {
     private static Javalin app;
     private static String baseUrl;
-    private static Url existingUrl;
     private static Transaction transaction;
+    private static MockWebServer mockServer;
+    private static String mockServerUrl;
 
     @BeforeAll
-    public static void beforeAll() {
+    public static void beforeAll() throws IOException {
         app = App.getApp();
         app.start(0);
         int port = app.port();
         baseUrl = "http://localhost:" + port;
 
-        existingUrl = new Url("https://example.com");
-        existingUrl.save();
+        mockServer = new MockWebServer();
+        MockResponse mockedResponse = new MockResponse()
+                .setBody("""
+                            <html lang='en'>
+                                <head>
+                                    <title>Example title</title>
+                                    <meta name="description"\s
+                                    content="GitHub is where over 100 million developers shape the future of software,\s
+                                     together.">
+                                </head>
+                                <body>
+                                    <div>
+                                        <h1>Test page</h1>
+                                    </div>
+                                </body>
+                            </html>
+                            """);
+        mockServer.enqueue(mockedResponse);
+        mockServer.start();
+        mockServerUrl = mockServer.url("/").toString().replaceAll("/$", "");
+
+        new Url("https://test.com").save();
+        new Url(mockServerUrl).save();
     }
 
     @AfterAll
@@ -81,7 +104,7 @@ public final class AppTest {
             String body = response.getBody();
 
             assertThat(response.getStatus()).isEqualTo(200);
-            assertThat(body).contains(existingUrl.getName());
+            assertThat(body).contains(mockServerUrl);
         }
 
         @Test
@@ -127,24 +150,19 @@ public final class AppTest {
     @Nested
     class CheckTest {
         @Test
-        public void createSuccessfulRequest() {
-            MockWebServer server = new MockWebServer();
-            server.url(existingUrl.toString());
-            server.enqueue(new MockResponse().setBody("hello, world!"));
-
-            HttpUrl appendUrl = server.url("/urls/" + existingUrl.getId() + "/checks");
+        public void createSuccessfulRequest() throws IOException {
+            Url url = new QUrl().name.equalTo(mockServerUrl).findOne();
             HttpResponse responsePost = Unirest
-                    .post(appendUrl.toString())
+                    .post(baseUrl + "/urls/" + url.getId() + "/checks")
                     .asString();
-            assertThat(responsePost.getBody()).isEqualTo("hello, world!");
+
+            UrlCheck check = new QUrlCheck().findOne();
+            assertThat(check.getTitle()).isEqualTo("Example title");
+            assertThat(responsePost.getStatus()).isEqualTo(302);
         }
 
         @Test
         public void createBadRequest() throws IOException {
-            MockWebServer server = new MockWebServer();
-            server.url(existingUrl.toString()).toString();
-            server.enqueue(new MockResponse().setBody("hello, world!"));
-
             HttpResponse responsePost = Unirest
                     //999 - identifier which can't be in our DB
                     .post(baseUrl + "/urls/999/checks")
