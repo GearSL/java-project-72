@@ -19,4 +19,7 @@ check:
 tasks:
 	./gradlew tasks
 
+setup:
+	gradle wrapper --gradle-version 8.2.1
+
 .PHONY: build

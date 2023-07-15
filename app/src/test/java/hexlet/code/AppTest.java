@@ -20,6 +20,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.util.List;
 
 public final class AppTest {
     private static Javalin app;
@@ -56,8 +57,10 @@ public final class AppTest {
         mockServer.start();
         mockServerUrl = mockServer.url("/").toString().replaceAll("/$", "");
 
-        new Url("https://test.com").save();
-        new Url(mockServerUrl).save();
+        Url existedUrl = new Url("https://test.com");
+        existedUrl.save();
+        Url existedMock = new Url(mockServerUrl);
+        existedMock.save();
     }
 
     @AfterAll
@@ -151,6 +154,7 @@ public final class AppTest {
     class CheckTest {
         @Test
         public void createSuccessfulRequest() throws IOException {
+            List<Url> urls = new QUrl().findList();
             Url url = new QUrl().name.equalTo(mockServerUrl).findOne();
             HttpResponse responsePost = Unirest
                     .post(baseUrl + "/urls/" + url.getId() + "/checks")
