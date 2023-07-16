@@ -10,7 +10,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
-public class UrlParserServiceImpl implements UrlParserService {
+public final class UrlParserServiceImpl implements UrlParserService {
     @Override
     public UrlCheckDto parseUrl(Url url) throws Exception {
         try {

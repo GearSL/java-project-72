@@ -17,11 +17,3 @@ ebean:
       seedSql: seed.sql
   migration:
     run: true
-
-  h2:
-    console:
-      enabled: true
-      # Указываем путь, по которому будет открываться консоль
-      path: /h2console/
-      settings:
-        web-allow-others: true
