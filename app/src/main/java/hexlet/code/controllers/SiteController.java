@@ -6,17 +6,12 @@ import hexlet.code.domain.query.QUrl;
 import hexlet.code.domain.query.QUrlCheck;
 import io.javalin.http.Handler;
 import io.javalin.http.NotFoundResponse;
-
 import java.net.URL;
 import java.util.List;
 
 public final class SiteController {
     public static Handler addSite = ctx -> {
         String inputUrl = ctx.formParam("url");
-        String protocol = "";
-        String host = "";
-        int port = 0;
-
         URL urlParser = null;
 
         try {
@@ -26,9 +21,10 @@ public final class SiteController {
             ctx.sessionAttribute("flash-type", "danger");
             ctx.redirect("/");
         }
-        port = urlParser.getPort();
-        host = urlParser.getHost();
-        protocol = urlParser.getProtocol();
+
+        int port = urlParser == null ? -1 : urlParser.getPort();
+        String host = urlParser == null ? "" : urlParser.getHost();
+        String protocol = urlParser == null ? "https" : urlParser.getProtocol();
 
         String resultName = protocol + "://" + host + (port == -1 ? "" : ":" + port);
         Url url = new Url(resultName);

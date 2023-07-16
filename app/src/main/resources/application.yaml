@@ -10,10 +10,9 @@ datasource:
     url: jdbc:postgresql://${DATABASE_HOST}:${DATABASE_PORT}/${DATABASE_NAME}
 
 ebean:
-  db:
-    ddl:
-      run: true
-      generate: true
-      seedSql: seed.sql
-  migration:
+  ddl:
     run: true
+    generate: true
+    seedSql: seed.sql
+  # migration:
+  #   run: true
