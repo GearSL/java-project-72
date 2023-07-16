@@ -18,9 +18,11 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
 import java.io.IOException;
-import java.util.List;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 
 public final class AppTest {
     private static Javalin app;
@@ -28,6 +30,17 @@ public final class AppTest {
     private static Transaction transaction;
     private static MockWebServer mockServer;
     private static String mockServerUrl;
+
+
+    private static Path getFixturePath(String fileName) {
+        return Paths.get("src", "test", "resources", "fixtures", fileName)
+                .toAbsolutePath().normalize();
+    }
+
+    private static String readFixture(String fileName) throws IOException {
+        Path filePath = getFixturePath(fileName);
+        return Files.readString(filePath).trim();
+    }
 
     @BeforeAll
     public static void beforeAll() throws IOException {
@@ -37,30 +50,14 @@ public final class AppTest {
         baseUrl = "http://localhost:" + port;
 
         mockServer = new MockWebServer();
-        MockResponse mockedResponse = new MockResponse()
-                .setBody("""
-                            <html lang='en'>
-                                <head>
-                                    <title>Example title</title>
-                                    <meta name="description"\s
-                                    content="GitHub is where over 100 million developers shape the future of software,\s
-                                     together.">
-                                </head>
-                                <body>
-                                    <div>
-                                        <h1>Test page</h1>
-                                    </div>
-                                </body>
-                            </html>
-                            """);
+        String htmlString = readFixture("index.html");
+        MockResponse mockedResponse = new MockResponse().setBody(htmlString);
         mockServer.enqueue(mockedResponse);
         mockServer.start();
         mockServerUrl = mockServer.url("/").toString().replaceAll("/$", "");
 
         Url existedUrl = new Url("https://test.com");
         existedUrl.save();
-        Url existedMock = new Url(mockServerUrl);
-        existedMock.save();
     }
 
     @AfterAll
@@ -153,25 +150,28 @@ public final class AppTest {
     @Nested
     class CheckTest {
         @Test
-        public void createSuccessfulRequest() throws IOException {
-            List<Url> urls = new QUrl().findList();
-            Url url = new QUrl().name.equalTo(mockServerUrl).findOne();
+        public void createSuccessfulRequest() {
+            Unirest.post(baseUrl + "/urls")
+                    .field("url", mockServerUrl)
+                    .asEmpty();
+
+            Url findedUrl = new QUrl().name.equalTo(mockServerUrl).findOne();
             HttpResponse responsePost = Unirest
-                    .post(baseUrl + "/urls/" + url.getId() + "/checks")
+                    .post(baseUrl + "/urls/" + findedUrl.getId() + "/checks")
                     .asString();
 
-            UrlCheck check = new QUrlCheck().findOne();
+            UrlCheck check = new QUrlCheck().url.equalTo(findedUrl).findOne();
             assertThat(check.getTitle()).isEqualTo("Example title");
             assertThat(responsePost.getStatus()).isEqualTo(302);
         }
 
         @Test
-        public void createBadRequest() throws IOException {
+        public void createBadRequest() {
             HttpResponse responsePost = Unirest
                     //999 - identifier which can't be in our DB
                     .post(baseUrl + "/urls/999/checks")
                     .asString();
-            assertThat(responsePost.getStatus()).isEqualTo(302);
+            assertThat(responsePost.getStatus()).isEqualTo(404);
         }
     }
 }

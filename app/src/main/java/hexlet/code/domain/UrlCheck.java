@@ -4,7 +4,6 @@ import io.ebean.Model;
 import io.ebean.annotation.WhenCreated;
 import lombok.Getter;
 import lombok.Setter;
-
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Lob;
