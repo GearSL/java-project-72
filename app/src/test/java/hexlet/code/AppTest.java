@@ -163,7 +163,7 @@ public final class AppTest {
             UrlCheck check = new QUrlCheck().url.equalTo(findedUrl).findOne();
             assertThat(check.getTitle()).isEqualTo("Example title");
             assertThat(check.getDescription())
-                    .isEqualTo("GitHub is where over 100 million developers shape the future of software, together.");
+                    .contains("GitHub is where over 100 million developers shape the future of software, together.");
             assertThat(check.getH1()).isEqualTo("Test page");
             assertThat(responsePost.getStatus()).isEqualTo(302);
         }

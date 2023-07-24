@@ -41,7 +41,6 @@ public class CheckController {
             ctx.sessionAttribute("flash", "Страница успешно проверена");
             ctx.sessionAttribute("flash-type", "success");
 
-            ctx.redirect("/urls/" + urlId);
         } catch (UnirestException e) {
             ctx.sessionAttribute("flash", "Некорректный адрес");
             ctx.sessionAttribute("flash-type", "danger");
@@ -49,5 +48,7 @@ public class CheckController {
             ctx.sessionAttribute("flash", e.getMessage());
             ctx.sessionAttribute("flash-type", "danger");
         }
+
+        ctx.redirect("/urls/" + urlId);
     };
 }
