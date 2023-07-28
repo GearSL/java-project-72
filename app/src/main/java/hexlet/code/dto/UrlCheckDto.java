@@ -13,8 +13,6 @@ public class UrlCheckDto {
     private int statusCode;
     private String title;
     private String h1;
-    @Lob
     private String description;
-    @ManyToOne
     private Url url;
 }

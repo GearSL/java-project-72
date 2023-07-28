@@ -64,7 +64,9 @@ public final class SiteController {
             throw new NotFoundResponse();
         }
 
-        List<UrlCheck> urlChecks = new QUrlCheck().url.equalTo(url).findList();
+        List<UrlCheck> urlChecks = new QUrlCheck()
+                .url.equalTo(url)
+                .findList();
 
         ctx.attribute("url", url);
         ctx.attribute("urlChecks", urlChecks);
