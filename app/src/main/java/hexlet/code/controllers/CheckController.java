@@ -17,7 +17,9 @@ import org.jsoup.nodes.Element;
 public class CheckController {
     public static Handler addCheck = ctx -> {
         long urlId = Long.parseLong(ctx.pathParam("id"));
-        Url url = new QUrl().id.equalTo(urlId).findOne();
+        Url url = new QUrl()
+                .id.equalTo(urlId)
+                .findOne();
 
         if (url == null) {
             throw new NotFoundResponse("Не найден URL для которого следует выполнить проверку");
